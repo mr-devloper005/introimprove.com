@@ -3,12 +3,12 @@ import { slot4BrandConfig } from '@/editable/theme/brand.config'
 export const globalContent = {
   site: {
     name: slot4BrandConfig.siteName,
-    tagline: slot4BrandConfig.tagline || 'Independent reading platform',
+    tagline: slot4BrandConfig.tagline || 'Article and profile directory',
     domain: slot4BrandConfig.domain,
     baseUrl: slot4BrandConfig.baseUrl,
   },
   nav: {
-    tagline: 'Independent reading platform',
+    tagline: 'Article and profile directory',
     primaryLinks: [
       { label: 'Articles', href: '/articles' },
       { label: 'Visuals', href: '/image-sharing' },
@@ -21,8 +21,8 @@ export const globalContent = {
     },
   },
   footer: {
-    tagline: 'Stories, resources, and discoverable posts',
-    description: 'A connected publishing surface for articles, visuals, listings, profiles, bookmarks, and downloadable resources.',
+    tagline: 'Articles, profiles, and discoverable posts',
+    description: 'A public discovery surface for articles, professional profiles, creators, businesses, and useful resources.',
     columns: [
       {
         title: 'Explore',

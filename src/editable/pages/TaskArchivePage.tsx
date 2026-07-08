@@ -9,6 +9,7 @@ import { taskPageMetadata } from '@/config/site.content'
 import { taskPageVoices } from '@/editable/content/task-pages.content'
 import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
 import { getTaskTheme, taskThemeStyle } from '@/editable/theme/task-themes'
+import { Ads } from '@/lib/ads'
 
 export const revalidate = 3
 
@@ -32,7 +33,7 @@ const getImages = (post: SitePost) => {
   return [...media, ...images, ...(isUrl(image) ? [image] : []), ...(isUrl(logo) ? [logo] : [])].filter(Boolean).slice(0, 8)
 }
 
-const placeholder = '/placeholder.svg?height=900&width=1200'
+const placeholder = '/favicon.png?v=20260413'
 const getImage = (post: SitePost) => getImages(post)[0] || placeholder
 const getCategory = (post: SitePost, fallback: string) => asText(getContent(post).category) || post.tags?.[0] || fallback
 const stripHtml = (value: string) => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -56,17 +57,34 @@ function pageHref(basePath: string, category: string, page: number) {
 }
 
 const taskGrid: Record<TaskKey, string> = {
-  article: 'grid gap-7 md:grid-cols-2 xl:grid-cols-3',
+  article: 'grid gap-5 lg:grid-cols-2',
   listing: 'grid gap-5 xl:grid-cols-2',
   classified: 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3',
   image: 'columns-1 gap-5 [column-fill:_balance] sm:columns-2 xl:columns-3',
   sbm: 'grid gap-5 md:grid-cols-2 xl:grid-cols-3',
   pdf: 'grid gap-5 md:grid-cols-2 xl:grid-cols-3',
-  profile: 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  profile: 'grid gap-5 md:grid-cols-2 xl:grid-cols-3',
 }
 
-// Shared premium surface: hairline border, soft radius, smooth lift on hover.
-const cardBase = 'group block rounded-[var(--tk-radius)] border border-[var(--tk-line)] bg-[var(--tk-surface)] transition duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_72px_rgba(15,23,42,0.14)]'
+const cardBase = 'group block rounded-md border border-[var(--tk-line)] bg-[var(--tk-surface)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(31,94,184,0.13)]'
+
+const archiveAdSlot: Record<TaskKey, string> = {
+  article: 'header',
+  listing: 'sidebar',
+  classified: 'in-feed',
+  image: 'header',
+  sbm: 'sidebar',
+  pdf: 'in-feed',
+  profile: 'article-bottom',
+}
+
+function AdBand({ slot }: { slot: string }) {
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <Ads slot={slot} showLabel eager className="mx-auto w-full" />
+    </div>
+  )
+}
 
 export async function EditableTaskArchiveRoute({
   task,
@@ -92,40 +110,44 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
   const page = pagination.page || 1
   const label = taskConfig?.label || task
   const categoryLabel = category === 'all' ? 'All categories' : CATEGORY_OPTIONS.find((item) => item.slug === category)?.name || category
+  const adSlot = archiveAdSlot[task] || archiveAdSlot.article
 
   return (
     <EditableSiteShell>
       <main style={taskThemeStyle(task)} className="min-h-screen bg-[var(--tk-bg)] text-[var(--tk-text)]">
-        <header className="relative overflow-hidden border-b border-[var(--tk-line)]">
-          <div className="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-[radial-gradient(60%_60%_at_50%_0%,var(--tk-glow),transparent_70%)]" />
-          <div className="relative mx-auto max-w-[var(--editable-container)] px-6 py-20 sm:py-28 lg:px-8">
-            <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.34em] text-[var(--tk-accent)]">
+        <header className="relative overflow-hidden border-b border-[var(--tk-line)] bg-[#eaf4ff]">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,#d8e8fb_0%,#ffffff_48%,#cdeffc_100%)]" />
+          <div className="relative mx-auto grid max-w-[var(--editable-container)] gap-8 px-6 py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8 lg:py-16">
+            <div className="self-center">
+            <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[var(--tk-accent)]">
               <span>{theme.kicker}</span>
               <span className="h-1 w-1 rounded-full bg-[var(--tk-accent)] opacity-50" />
               <span className="text-[var(--tk-muted)]">{label}</span>
             </div>
-            <h1 className="editable-display mt-6 max-w-3xl text-balance text-[2.5rem] font-semibold leading-[1.06] tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+            <h1 className="editable-display mt-5 max-w-3xl text-balance text-4xl font-extrabold leading-tight tracking-[-0.02em] sm:text-5xl">
               {voice?.headline || `Browse ${label}`}
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-[var(--tk-muted)]">{voice?.description || theme.note}</p>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--tk-muted)] sm:text-lg">{voice?.description || theme.note}</p>
             {voice?.chips?.length ? (
-              <div className="mt-8 flex flex-wrap gap-2.5">
+              <div className="mt-6 flex flex-wrap gap-2.5">
                 {voice.chips.map((chip) => (
-                  <span key={chip} className="rounded-full border border-[var(--tk-line)] bg-[var(--tk-surface)] px-3.5 py-1.5 text-xs font-medium text-[var(--tk-muted)]">{chip}</span>
+                  <span key={chip} className="rounded-md border border-white/80 bg-white/75 px-3.5 py-1.5 text-xs font-semibold text-[var(--tk-muted)]">{chip}</span>
                 ))}
               </div>
             ) : null}
 
-            <div className="mt-12 flex flex-col gap-4 border-t border-[var(--tk-line)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+            </div>
+
+            <div className="rounded-md border border-white/80 bg-white/85 p-5 shadow-[0_18px_44px_rgba(31,94,184,0.11)] backdrop-blur">
               <p className="text-sm text-[var(--tk-muted)]">
                 <span className="font-semibold text-[var(--tk-text)]">{posts.length}</span> {posts.length === 1 ? 'post' : 'posts'} · {categoryLabel}
               </p>
-              <form action={basePath} className="flex items-center gap-2.5">
+              <form action={basePath} className="mt-4 grid gap-3">
                 <div className="relative">
                   <select
                     name="category"
                     defaultValue={category}
-                    className="h-11 appearance-none rounded-full border border-[var(--tk-line)] bg-[var(--tk-surface)] pl-4 pr-10 text-sm font-medium text-[var(--tk-text)] outline-none transition focus:border-[var(--tk-accent)]"
+                    className="h-12 w-full appearance-none rounded-md border border-[var(--tk-line)] bg-[var(--tk-surface)] pl-4 pr-10 text-sm font-semibold text-[var(--tk-text)] outline-none transition focus:border-[var(--tk-accent)]"
                     aria-label={voice?.filterLabel || 'Filter category'}
                   >
                     <option value="all">All categories</option>
@@ -133,16 +155,20 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
                   </select>
                   <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--tk-muted)]" />
                 </div>
-                <button className="inline-flex h-11 items-center rounded-full bg-[var(--tk-accent)] px-5 text-sm font-semibold text-[var(--tk-on-accent)] transition hover:opacity-90">Apply</button>
+                <button className="inline-flex h-12 items-center justify-center rounded-md bg-[var(--tk-accent)] px-5 text-sm font-semibold text-[var(--tk-on-accent)] transition hover:opacity-90">Apply filter</button>
               </form>
             </div>
           </div>
         </header>
 
-        <section className="mx-auto max-w-[var(--editable-container)] px-6 py-16 sm:py-20 lg:px-8">
+        <AdBand slot={adSlot} />
+
+        <section className="mx-auto max-w-[var(--editable-container)] px-6 py-10 sm:py-14 lg:px-8">
           {posts.length ? (
-            <div className={taskGrid[task]}>
-              {posts.map((post, index) => <ArchivePostCard key={post.id || post.slug} post={post} task={task} basePath={basePath} index={index} />)}
+            <div className="rounded-xl border border-[var(--tk-line)] bg-white/55 p-4 shadow-[0_18px_60px_rgba(31,94,184,0.08)] sm:p-6">
+              <div className={taskGrid[task]}>
+                {posts.map((post, index) => <ArchivePostCard key={post.id || post.slug} post={post} task={task} basePath={basePath} index={index} />)}
+              </div>
             </div>
           ) : (
             <div className="mx-auto max-w-xl rounded-[var(--tk-radius)] border border-dashed border-[var(--tk-line)] bg-[var(--tk-surface)] px-8 py-16 text-center">
@@ -159,6 +185,7 @@ export function TaskArchiveView({ task, posts, pagination, category, basePath }:
               {pagination.hasNextPage ? <Link href={pageHref(basePath, category, page + 1)} className="rounded-full border border-[var(--tk-line)] px-5 py-2.5 font-medium transition hover:border-[var(--tk-accent)]">Next</Link> : null}
             </nav>
           ) : null}
+
         </section>
       </main>
     </EditableSiteShell>
@@ -185,8 +212,6 @@ function CardArrow({ label }: { label: string }) {
   )
 }
 
-// Yelp-style red star ratings. Prefers real rating/review fields, falls back to
-// a stable derived value so the UI always reads well (wire to real data later).
 const hashStr = (value: string) => {
   let h = 0
   for (let i = 0; i < value.length; i += 1) h = (h * 31 + value.charCodeAt(i)) >>> 0

@@ -11,7 +11,7 @@ export function getEditablePostImage(post?: SitePost | null) {
   const images = Array.isArray(content.images) ? content.images : []
   const contentImage = images.find((url): url is string => typeof url === 'string' && Boolean(url))
   const logo = typeof content.logo === 'string' ? content.logo : ''
-  return mediaUrl || contentImage || logo || '/placeholder.svg?height=900&width=1400'
+  return mediaUrl || contentImage || logo || '/favicon.png?v=20260413'
 }
 
 export function getEditableExcerpt(post?: SitePost | null, limit = 150) {

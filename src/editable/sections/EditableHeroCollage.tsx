@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
   is disabled for prefers-reduced-motion users.
 */
 export function EditableHeroCollage({ images }: { images: string[] }) {
-  const pool = images.length ? images : ['/placeholder.svg?height=900&width=1400']
+  const pool = images.length ? images : ['/favicon.png?v=20260413']
   // Keep tiles big: at most a 2x2 collage so each image reads large in the hero.
   const cellCount = pool.length >= 4 ? 4 : pool.length >= 2 ? 2 : 1
   const [tick, setTick] = useState(0)
